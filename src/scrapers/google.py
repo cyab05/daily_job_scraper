@@ -30,8 +30,6 @@ KEYWORDS = re.compile(
     re.IGNORECASE,
 )
 
-EXCLUDE_KEYWORDS = re.compile(r"\b(principal|staff)\b", re.IGNORECASE)
-
 CA_LOCATION = re.compile(r"\b(california|ca)\b", re.IGNORECASE)
 
 
@@ -103,8 +101,6 @@ class GoogleScraper(BaseScraper):
             title = r["title"]
             location = r.get("location") or ""
             if not KEYWORDS.search(title):
-                continue
-            if EXCLUDE_KEYWORDS.search(title):
                 continue
             if not CA_LOCATION.search(location):
                 continue

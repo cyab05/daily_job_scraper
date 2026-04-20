@@ -30,8 +30,6 @@ KEYWORDS = re.compile(
     re.IGNORECASE,
 )
 
-EXCLUDE_KEYWORDS = re.compile(r"\b(principal|staff)\b", re.IGNORECASE)
-
 # Keep only roles located in California. 
 CA_LOCATION = re.compile(r"\b(california|ca)\b", re.IGNORECASE)
 
@@ -90,10 +88,6 @@ class AppleScraper(BaseScraper):
             location = r.get("location") or ""
             
             if not KEYWORDS.search(title) and not (team and KEYWORDS.search(team)):
-                continue
-                
-            # Filter out Principal or Staff roles
-            if EXCLUDE_KEYWORDS.search(title):
                 continue
                 
             # Keep only roles in California
