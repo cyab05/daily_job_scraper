@@ -30,6 +30,10 @@ KEYWORDS = re.compile(
     re.IGNORECASE,
 )
 
+EXCLUDE_KEYWORDS = re.compile(r"\b(principal|staff)\b", re.IGNORECASE)
+
+CA_LOCATION = re.compile(r"\b(california|ca)\b", re.IGNORECASE)
+
 
 class GoogleScraper(BaseScraper):
     company = "Google"
@@ -97,7 +101,12 @@ class GoogleScraper(BaseScraper):
             if not r.get("title") or not r.get("href"):
                 continue
             title = r["title"]
+            location = r.get("location") or ""
             if not KEYWORDS.search(title):
+                continue
+            if EXCLUDE_KEYWORDS.search(title):
+                continue
+            if not CA_LOCATION.search(location):
                 continue
             m = _JOB_ID_RE.search(r["href"])
             if not m:
