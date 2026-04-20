@@ -30,6 +30,11 @@ KEYWORDS = re.compile(
     re.IGNORECASE,
 )
 
+EXCLUDE_KEYWORDS = re.compile(r"\b(principal|staff)\b", re.IGNORECASE)
+
+# Keep only roles located in California. 
+CA_LOCATION = re.compile(r"\b(california|ca)\b", re.IGNORECASE)
+
 
 class AppleScraper(BaseScraper):
     company = "Apple"
@@ -79,20 +84,33 @@ class AppleScraper(BaseScraper):
         for r in raw:
             if not r.get("href") or not r.get("title"):
                 continue
+                
             title = r["title"]
             team = r.get("team")
+            location = r.get("location") or ""
+            
             if not KEYWORDS.search(title) and not (team and KEYWORDS.search(team)):
                 continue
+                
+            # Filter out Principal or Staff roles
+            if EXCLUDE_KEYWORDS.search(title):
+                continue
+                
+            # Keep only roles in California
+            if not CA_LOCATION.search(location):
+                continue
+                
             m = _ROLE_ID_RE.search(r["href"])
             if not m:
                 continue
+            
             role_id = m.group(1)
             url = f"https://jobs.apple.com{r['href']}" if r["href"].startswith("/") else r["href"]
             jobs.append(Job(
                 company=self.company,
                 job_id=role_id,
                 title=title,
-                location=r.get("location") or "",
+                location=location,
                 url=url,
                 posted_date=_parse_posted(r.get("posted") or ""),
                 team=team,
